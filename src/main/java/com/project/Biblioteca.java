@@ -1,36 +1,45 @@
 package com.project;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
+
+import javax.persistence.*;
 
 @Entity
-public class Biblioteca {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int bibliotecaId;
+@Table(name = "Biblioteca", uniqueConstraints = { @UniqueConstraint(columnNames = "bibliotecaId") })
+public class Biblioteca implements Serializable {
 
-    @Column
+    @Id
+    @Column(name = "bibliotecaId", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long bibliotecaId;
+
+    @Column(name = "nom")
     private String nom;
 
-    @Column
+    @Column(name = "ciutat")
     private String ciutat;
 
-    @ManyToMany
-    private List<Llibre> llibres;
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @JoinTable(name = "Llibre_Biblioteca", joinColumns = {
+            @JoinColumn(referencedColumnName = "bibliotecaId") }, inverseJoinColumns = {
+            @JoinColumn(referencedColumnName = "llibreId") })
+    private Set<Llibre> llibres;
 
     public Biblioteca() {}
-    public Biblioteca(int bibliotecaId, String nom, String ciutat, List<Llibre> llibres) {
-        this.bibliotecaId = bibliotecaId;
+
+    public Biblioteca(String nom, String ciutat) {
         this.nom = nom;
         this.ciutat = ciutat;
-        this.llibres = llibres;
     }
 
-    public int getBibliotecaId() {
+    public long getBibliotecaId() {
         return bibliotecaId;
     }
 
-    public void setBibliotecaId(int bibliotecaId) {
+    public void setBibliotecaId(long bibliotecaId) {
         this.bibliotecaId = bibliotecaId;
     }
 
@@ -50,21 +59,15 @@ public class Biblioteca {
         this.ciutat = ciutat;
     }
 
-    public List<Llibre> getLlibres() {
+    public Set<Llibre> getLlibres() {
         return llibres;
     }
 
-    public void setLlibres(List<Llibre> llibres) {
+    public void setLlibres(Set<Llibre> llibres) {
         this.llibres = llibres;
     }
-
     @Override
     public String toString() {
-        return "Biblioteca{" +
-                "bibliotecaId=" + bibliotecaId +
-                ", nom='" + nom + '\'' +
-                ", ciutat='" + ciutat + '\'' +
-                ", llibres=" + llibres +
-                '}';
+        return bibliotecaId + ": " + nom + ", Llibres:" + this.getLlibres();
     }
 }

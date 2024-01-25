@@ -1,51 +1,47 @@
 package com.project;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.ManyToMany;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Llibre {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int llibreId;
+@Table(name = "Llibre", uniqueConstraints = { @UniqueConstraint(columnNames = "llibreId") })
+public class Llibre implements Serializable {
 
-    @Column
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "llibreId", unique = true, nullable = false)
+    private long llibreId;
+
+    @Column(name = "nom")
     private String nom;
 
-    @Column
+    @Column(name = "editoral")
     private String editoral;
 
-    @Column
-    private int id_autor;
-
-    @ManyToMany
-    private List<Biblioteca> biblioteques;
-
     @ManyToOne
-    private Persona persona;
+    @JoinColumn(name = "autorId", insertable = false, updatable = false)
+    private Autor autor;
+
+    @ManyToMany(mappedBy = "llibres")
+    private Set<Biblioteca> biblioteques;
+
+    @ManyToMany(mappedBy = "llibres")
+    private Set<Persona> persones;
+
 
     public Llibre() {}
 
-    public Llibre(int llibreId, String nom, String editoral, int id_autor, List<Biblioteca> biblioteques, Persona persona) {
-        this.llibreId = llibreId;
+    public Llibre(String nom, String editoral) {
         this.nom = nom;
         this.editoral = editoral;
-        this.id_autor = id_autor;
-        this.biblioteques = biblioteques;
-        this.persona = persona;
     }
-
-    public int getLlibreId() {
+    public long getLlibreId() {
         return llibreId;
     }
 
-    public void setLlibreId(int llibreId) {
+    public void setLlibreId(long llibreId) {
         this.llibreId = llibreId;
     }
 
@@ -65,39 +61,31 @@ public class Llibre {
         this.editoral = editoral;
     }
 
-    public int getId_autor() {
-        return id_autor;
+    public Autor getAutor() {
+        return autor;
     }
 
-    public void setId_autor(int id_autor) {
-        this.id_autor = id_autor;
+    public void setAutor(Autor autor) {
+        this.autor = autor;
     }
 
-    public List<Biblioteca> getBiblioteques() {
+    public Set<Biblioteca> getBiblioteques() {
         return biblioteques;
     }
 
-    public void setBiblioteques(List<Biblioteca> biblioteques) {
+    public void setBiblioteques(Set<Biblioteca> biblioteques) {
         this.biblioteques = biblioteques;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public Set<Persona> getPersones() {
+        return persones;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setPersones(Set<Persona> persones) {
+        this.persones = persones;
     }
-
     @Override
     public String toString() {
-        return "Llibre{" +
-                "llibreId=" + llibreId +
-                ", nom='" + nom + '\'' +
-                ", editoral='" + editoral + '\'' +
-                ", id_autor=" + id_autor +
-                ", biblioteques=" + biblioteques +
-                ", persona=" + persona +
-                '}';
+        return llibreId + ": " + nom + ", " + editoral;
     }
 }

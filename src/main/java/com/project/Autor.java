@@ -6,33 +6,40 @@ import javax.persistence.OneToMany;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
+import javax.persistence.*;
 
 @Entity
-public class Autor {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int autorId;
+@Table(name = "Autor", uniqueConstraints = { @UniqueConstraint(columnNames = "autorId") })
+public class Autor implements Serializable {
 
-    @Column
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "autorId", unique = true, nullable = false)
+    private long autorId;
+
+    @Column(name = "nom")
     private String nom;
 
-    @OneToMany
-    private List<Llibre> llibres;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "autorId")
+    private Set<Llibre> llibres;
+
 
     public Autor() {}
 
-    public Autor(int autorId, String nom, List<Llibre> llibres) {
-        this.autorId = autorId;
+    public Autor(String nom) {
         this.nom = nom;
-        this.llibres = llibres;
     }
 
-    public int getAutorId() {
+
+    public long getAutorId() {
         return autorId;
     }
 
-    public void setAutorId(int autorId) {
+    public void setAutorId(long autorId) {
         this.autorId = autorId;
     }
 
@@ -44,20 +51,11 @@ public class Autor {
         this.nom = nom;
     }
 
-    public List<Llibre> getLlibres() {
+    public Set<Llibre> getLlibres() {
         return llibres;
     }
 
-    public void setLlibres(List<Llibre> llibres) {
+    public void setLlibres(Set<Llibre> llibres) {
         this.llibres = llibres;
-    }
-
-    @Override
-    public String toString() {
-        return "Autor{" +
-                "autorId=" + autorId +
-                ", nom='" + nom + '\'' +
-                ", llibres=" + llibres +
-                '}';
     }
 }

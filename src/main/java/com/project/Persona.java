@@ -1,41 +1,47 @@
 package com.project;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Persona {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int personaId;
+@Table(name = "Persona", uniqueConstraints = { @UniqueConstraint(columnNames = "personaId") })
+public class Persona implements Serializable {
 
-    @Column
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "personaId", unique = true, nullable = false)
+    private long personaId;
+
+    @Column(name = "dni")
     private String dni;
 
-    @Column
+    @Column(name = "nom")
     private String nom;
 
-    @Column
+    @Column(name = "telefon")
     private String telefon;
 
-    @ManyToMany
-    private List<Llibre> llibres;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(name = "Llibre_Persona", joinColumns = {
+            @JoinColumn(referencedColumnName = "personaId")}, inverseJoinColumns = {
+            @JoinColumn(referencedColumnName = "llibreId")})
+    private Set<Llibre> llibres;
 
     public Persona() {}
 
-    public Persona(int personaId, String dni, String nom, String telefon, List<Llibre> llibres) {
-        this.personaId = personaId;
-        this.dni = dni;
+    public Persona(String dni, String nom, String telefon) {
         this.nom = nom;
+        this.dni = dni;
         this.telefon = telefon;
-        this.llibres = llibres;
     }
 
-    public int getPersonaId() {
+    public long getPersonaId() {
         return personaId;
     }
 
-    public void setPersonaId(int personaId) {
+    public void setPersonaId(long personaId) {
         this.personaId = personaId;
     }
 
@@ -63,22 +69,17 @@ public class Persona {
         this.telefon = telefon;
     }
 
-    public List<Llibre> getLlibres() {
+    public Set<Llibre> getLlibres() {
         return llibres;
     }
 
-    public void setLlibres(List<Llibre> llibres) {
+    public void setLlibres(Set<Llibre> llibres) {
         this.llibres = llibres;
     }
 
     @Override
     public String toString() {
-        return "Persona{" +
-                "personaId=" + personaId +
-                ", dni='" + dni + '\'' +
-                ", nom='" + nom + '\'' +
-                ", telefon='" + telefon + '\'' +
-                ", llibres=" + llibres +
-                '}';
+        return personaId + ": " + nom + ", " + telefon + ", Llibres:" + this.getLlibres();
     }
+
 }
